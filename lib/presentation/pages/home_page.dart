@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_app/data/repository/gemini_talk_repository_impl.dart';
+import 'package:gemini_app/domain/usecases/gemini_only_text_usecase.dart';
+import 'package:gemini_app/domain/usecases/gemini_text_and_image_usecase.dart';
 
-import '../services/https_service.dart';
-import '../services/log_service.dart';
-import '../services/utils_service.dart';
+import '../../core/services/log_service.dart';
+import '../../core/services/utils_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,23 +14,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  GeminiTextOnlyUseCase textOnlyUseCase =
+      GeminiTextOnlyUseCase(GeminiTalkRepositoryImpl());
+
+  GeminiTextAndImageUseCase textAndImageUseCase =
+      GeminiTextAndImageUseCase(GeminiTalkRepositoryImpl());
+
   apiTextOnly() async {
     var text = "What is the best way to learn Flutter development?";
-    var response = await Network.POST(
-        Network.API_GEMINI_TALK, Network.paramsTextOnly(text));
-    var result = Network.parseGeminiTalk(response!);
-    LogService.i(result.candidates[0].content.parts[0].text);
+    var result = await textOnlyUseCase.call(text);
+    LogService.i(result);
   }
 
   apiTextAndImage() async {
     var text = "What is this image?";
     var base64Image = await Utils.pickAndConvertImage();
-    LogService.i(base64Image);
-
-    var response = await Network.POST(
-        Network.API_GEMINI_TALK, Network.paramsTextAndImage(text, base64Image));
-    var result = Network.parseGeminiTalk(response!);
-    LogService.i(result.candidates[0].content.parts[0].text);
+    var result = await textAndImageUseCase.call(text, base64Image);
+    LogService.i(result);
   }
 
   @override

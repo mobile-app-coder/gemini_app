@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:http/http.dart';
 import 'package:http_interceptor/http/intercepted_client.dart';
 
-import '../models/gemini_talk_res.dart';
+import '../../models/gemini_talk_model.dart';
 import 'https_helper.dart';
 
 class Network {
@@ -95,8 +95,8 @@ class Network {
 
   /* Http Parsing */
 
-  static GeminiTalkRes parseGeminiTalk(String response) {
+  static GeminiTalkModel parseGeminiTalk(String response) {
     dynamic json = jsonDecode(response);
-    return GeminiTalkRes.fromJson(json);
+    return GeminiTalkModel.fromJson(json);
   }
 }
