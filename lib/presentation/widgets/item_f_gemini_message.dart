@@ -12,7 +12,7 @@ Widget itemOfGeminiMessage(MessageModel message) {
     width: double.infinity,
     child: Container(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

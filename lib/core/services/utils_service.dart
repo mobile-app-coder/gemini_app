@@ -1,12 +1,9 @@
-
-
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:image_picker/image_picker.dart';
 
-class Utils{
-
+class Utils {
   static Future<String> pickAndConvertImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -22,4 +19,13 @@ class Utils{
     return base64Image;
   }
 
+// static Future<File> base64ToImage(String base64Image){
+//   try {
+//     List<int> imageBytes = base64Decode(base64Image);
+//     // Do something with the decoded bytes
+//   } catch (error) {
+//     // Handle the error
+//   }
+//
+// }
 }
