@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:gemini_app/core/constants/constants.dart';
 import 'package:http/http.dart';
 import 'package:http_interceptor/http/intercepted_client.dart';
 
@@ -56,7 +57,7 @@ class Network {
 
   static Map<String, String> paramsApiKey() {
     Map<String, String> params = {};
-    params.addAll({'key': "AIzaSyBPiSZhzT816_Bn3umkrzxnKo4ohjTFD-w"});
+    params.addAll({'key': API_KEY});
     return params;
   }
 

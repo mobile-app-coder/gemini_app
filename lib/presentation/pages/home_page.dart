@@ -1,10 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gemini_app/data/repository/gemini_talk_repository_impl.dart';
-import 'package:gemini_app/domain/usecases/gemini_only_text_usecase.dart';
-import 'package:gemini_app/domain/usecases/gemini_text_and_image_usecase.dart';
-
-import '../../core/services/log_service.dart';
-import '../../core/services/utils_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,52 +8,86 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  GeminiTextOnlyUseCase textOnlyUseCase =
-      GeminiTextOnlyUseCase(GeminiTalkRepositoryImpl());
-
-  GeminiTextAndImageUseCase textAndImageUseCase =
-      GeminiTextAndImageUseCase(GeminiTalkRepositoryImpl());
-
-  apiTextOnly() async {
-    var text = "What is the best way to learn Flutter development?";
-    var result = await textOnlyUseCase.call(text);
-    LogService.i(result);
-  }
-
-  apiTextAndImage() async {
-    var text = "What is this image?";
-    var base64Image = await Utils.pickAndConvertImage();
-    var result = await textAndImageUseCase.call(text, base64Image);
-    LogService.i(result);
-  }
+  TextEditingController textController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: const Text("Gemini"),
+        centerTitle: true,
+        backgroundColor: Colors.black,
+        title: Image.asset(
+          height: 50,
+          "assets/images/gemini_logo.png",
+        ),
       ),
       body: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(10),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            MaterialButton(
-              color: Colors.blue,
-              onPressed: () {
-                apiTextOnly();
-              },
-              child: const Text("Text Only Input"),
+            Expanded(
+                child: Container(
+                    decoration: BoxDecoration(
+                        color: Colors.grey.shade900,
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(width: 2, color: Colors.black)),
+                    child: ListView())),
+            const SizedBox(
+              height: 5,
             ),
-            MaterialButton(
-              color: Colors.blue,
-              onPressed: () {
-                apiTextAndImage();
-              },
-              child: const Text("Text And Image Input"),
-            ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(width: 2, color: Colors.grey.shade600)),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: textController,
+                      onSubmitted: (text) {
+                        textController.clear();
+                      },
+                      maxLines: null,
+                      textInputAction: TextInputAction.send,
+                      cursorColor: Colors.white,
+                      style: const TextStyle(color: Colors.white),
+                      keyboardType: TextInputType.text,
+                      decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Message",
+                          hintStyle: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.attach_file,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {},
+                      ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.mic,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {},
+                      ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.send,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {},
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            )
           ],
         ),
       ),
