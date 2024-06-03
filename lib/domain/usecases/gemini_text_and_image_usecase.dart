@@ -1,11 +1,13 @@
+import 'package:dartz/dartz.dart';
+
 import '../repositories/gemini_talk_repository.dart';
 
-class GeminiTextOnlyUseCase {
-  GeminiTalkRepository repository;
+class GeminiTextAndImageUseCase {
+  final GeminiTalkRepository repository;
 
-  GeminiTextOnlyUseCase(this.repository);
+  GeminiTextAndImageUseCase(this.repository);
 
-  Future<String> call(String text) async {
-    return await repository.onTextOnly(text);
+  Future<Either<String, String>> call(String text, String base64) async {
+    return await repository.onTextAndImage(text, base64);
   }
 }
