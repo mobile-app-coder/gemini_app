@@ -22,7 +22,7 @@ Widget itemOfGeminiMessage(MessageModel message) {
                   color: Colors.grey,
                 ),
                 Icon(
-                  CupertinoIcons.volume_up,
+                  CupertinoIcons.volume_down,
                   color: Colors.grey,
                 )
               ]),

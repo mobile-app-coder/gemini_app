@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gemini_app/presentation/controllers/home_controller.dart';
+import 'package:gemini_app/presentation/controllers/starter_controller.dart';
 import 'package:gemini_app/presentation/pages/home_page.dart';
+import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
 
 class StarterPage extends StatefulWidget {
@@ -10,24 +13,18 @@ class StarterPage extends StatefulWidget {
 }
 
 class _StarterPageState extends State<StarterPage> {
-  late VideoPlayerController _controller;
+  StarterController starterController = Get.find<StarterController>();
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.asset("assets/videos/gemini.mp4")
-      ..initialize().then((_) {
-        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-        setState(() {});
-      });
-    _controller.play();
-    _controller.setLooping(true);
+    starterController.initVideoPlayer();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
+    starterController.onDispose();
   }
 
   @override
@@ -47,8 +44,8 @@ class _StarterPageState extends State<StarterPage> {
             ),
           ),
           Expanded(
-            child: _controller.value.isInitialized
-                ? VideoPlayer(_controller)
+            child: starterController.controller.value.isInitialized
+                ? VideoPlayer(starterController.controller)
                 : Container(),
           ),
           Row(
@@ -60,7 +57,7 @@ class _StarterPageState extends State<StarterPage> {
                     border: Border.all(color: Colors.white, width: 2)),
                 child: MaterialButton(
                     onPressed: () {
-                      Navigator.of(context).push(_rout());
+                      Get.to(const HomePage());
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,

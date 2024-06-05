@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +23,7 @@ Widget itemOfUserMessage(MessageModel message) {
                   topLeft: Radius.circular(25),
                   bottomLeft: Radius.circular(25),
                   bottomRight: Radius.circular(30),
+                  topRight: Radius.circular(5)
                 )),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -29,17 +33,17 @@ Widget itemOfUserMessage(MessageModel message) {
                   overflow: TextOverflow.visible,
                   style: const TextStyle(color: Colors.grey, fontSize: 16),
                 ),
-                Container(
+                message.base64Image != null ? Container(
                   height: 300,
                   padding: const EdgeInsets.only(top: 16),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(25),
-                    child: Image.network(
-                      message.base64Image!,
+                    child: Image.memory(
+                      base64Decode(message.base64Image!),
                       fit: BoxFit.fill,
                     ),
                   ),
-                )
+                ):SizedBox()
               ],
             ),
           ),
