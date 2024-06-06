@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_app/core/config/root_binding.dart';
-import 'package:gemini_app/presentation/pages/image_page.dart';
+import 'package:gemini_app/data/datasources/local/no_sql.dart';
 import 'package:gemini_app/presentation/pages/starter_page.dart';
 import 'package:get/get.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  HiveService.init();
   runApp(const MyApp());
 }
 

@@ -1,8 +1,9 @@
-import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:gemini_app/core/services/utils_service.dart';
+import 'package:gemini_app/data/repository/hive_repository_impl.dart';
 import 'package:gemini_app/domain/usecases/gemini_text_and_image_usecase.dart';
+import 'package:gemini_app/domain/usecases/get_messages_db_use_case.dart';
+import 'package:gemini_app/domain/usecases/save_message_db_uscase.dart';
 import 'package:get/get.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
@@ -25,16 +26,19 @@ class HomeController extends GetxController {
   String? image;
 
   apiTextOnly(String text) async {
-    var either = await textOnlyUseCase.call(textController.text);
+    var either = await textOnlyUseCase.call(text);
     either.fold((l) {
       LogService.d(l);
       var messageModel = MessageModel(message: l, isMine: false);
       messages.add(messageModel);
+      update();
+      saveMessages(messageModel);
     }, (r) async {
       LogService.d(r);
       var messageModel = MessageModel(message: r, isMine: false);
       messages.add(messageModel);
       update();
+      saveMessages(messageModel);
     });
   }
 
@@ -43,6 +47,7 @@ class HomeController extends GetxController {
         MessageModel(message: text, isMine: true, base64Image: image);
     messages.add(myMessage);
     update();
+    saveMessages(myMessage);
 
     if (image == null) {
       apiTextOnly(text);
@@ -75,10 +80,12 @@ class HomeController extends GetxController {
       LogService.d(l);
       var messageModel = MessageModel(message: l, isMine: false);
       messages.add(messageModel);
+      saveMessages(messageModel);
     }, (r) async {
       LogService.d(r);
       var messageModel = MessageModel(message: r, isMine: false);
       updateMessages(messageModel);
+      saveMessages(messageModel);
     });
   }
 
@@ -91,31 +98,60 @@ class HomeController extends GetxController {
   ///
   ///
   ///
-  SpeechToText _speechToText = SpeechToText();
-  bool _speechEnabled = false;
+  SpeechToText speechToText = SpeechToText();
+  bool speechEnabled = false;
+  Color microphoneColor = Colors.white;
   String _lastWords = '';
 
   void initSpeech() async {
-    _speechEnabled = await _speechToText.initialize();
+    speechEnabled = await speechToText.initialize();
   }
 
   void startListening() async {
-    _speechEnabled = true;
-    await _speechToText.listen(onResult: _onSpeechResult);
-
+    await speechToText.listen(onResult: _onSpeechResult);
+    microphoneColor = Colors.red;
+    update();
   }
 
   void stopListening() async {
-    _speechEnabled = false;
-    await _speechToText.stop();
+    await speechToText.stop();
+    microphoneColor = Colors.white;
+    update();
   }
 
   void _onSpeechResult(SpeechRecognitionResult result) {
     _lastWords = result.recognizedWords;
-    onSendPressed(_lastWords);
+
+    if (result.finalResult) {
+      microphoneColor = Colors.white;
+
+      onSendPressed(_lastWords);
+      update();
+    }
   }
 
   onStartListening() {
-    _speechToText.isNotListening ? startListening() : stopListening();
+    speechToText.isNotListening ? startListening() : stopListening();
+  }
+
+  //local database
+  GetMessagesDbUseCase databaseUseCase =
+      GetMessagesDbUseCase(HiveRepositoryImplementation());
+
+  SaveMessageUseCase saveMessageUseCase =
+      SaveMessageUseCase(HiveRepositoryImplementation());
+
+  getMessages() async {
+    var either = await databaseUseCase.call();
+    either.fold((l) {
+      update();
+    }, (r) async {
+      messages.addAll(r);
+      update();
+    });
+  }
+
+  saveMessages(MessageModel messageModel) async {
+    await saveMessageUseCase.call(messageModel);
   }
 }

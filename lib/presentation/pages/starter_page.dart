@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gemini_app/presentation/controllers/home_controller.dart';
 import 'package:gemini_app/presentation/controllers/starter_controller.dart';
 import 'package:gemini_app/presentation/pages/home_page.dart';
 import 'package:get/get.dart';
@@ -57,14 +56,14 @@ class _StarterPageState extends State<StarterPage> {
                     border: Border.all(color: Colors.white, width: 2)),
                 child: MaterialButton(
                     onPressed: () {
-                      Get.to(const HomePage());
+                      Get.off(() => const HomePage());
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           'Chat with gemini'.toUpperCase(),
-                          style: TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.white),
                         ),
                         const SizedBox(
                           width: 5,
@@ -81,45 +80,5 @@ class _StarterPageState extends State<StarterPage> {
         ]),
       ),
     );
-  }
-
-  Route _rout() {
-    return PageRouteBuilder(
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return ScaleTransition(
-          alignment: Alignment.center,
-          scale: Tween<double>(begin: 0.1, end: 1).animate(
-            CurvedAnimation(
-              parent: animation,
-              curve: Curves.bounceIn,
-            ),
-          ),
-          child: child,
-        );
-      },
-      transitionDuration: Duration(seconds: 2),
-      pageBuilder: (BuildContext context, Animation<double> animation,
-          Animation<double> secondaryAnimation) {
-        return HomePage();
-      },
-    );
-  }
-
-  Route _createRoute() {
-    return PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            const HomePage(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          var begin = const Offset(1.0, 0.0);
-          var end = Offset.zero;
-          var curve = Curves.ease;
-          var tween =
-              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-          final offsetAnimation = animation.drive(tween);
-          return SlideTransition(
-            position: offsetAnimation,
-            child: child,
-          );
-        });
   }
 }

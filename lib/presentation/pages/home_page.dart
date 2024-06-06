@@ -3,12 +3,9 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_app/presentation/controllers/home_controller.dart';
-
 import 'package:gemini_app/presentation/widgets/item_f_gemini_message.dart';
 import 'package:gemini_app/presentation/widgets/item_of_user_message.dart';
 import 'package:get/get.dart';
-
-import '../../core/services/log_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,8 +21,10 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    controller.getMessages();
     controller.initSpeech();
   }
+
   @override
   Widget build(BuildContext context) {
     return GetBuilder<HomeController>(builder: (_) {
@@ -35,7 +34,7 @@ class _HomePageState extends State<HomePage> {
           centerTitle: true,
           backgroundColor: Colors.black,
           title: Container(
-            margin: EdgeInsets.only(bottom: 10),
+            margin: const EdgeInsets.only(bottom: 10),
             child: Image.asset(
               height: 50,
               "assets/images/gemini_logo.png",
@@ -43,7 +42,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         body: Container(
-          margin: EdgeInsets.only(top: 20),
+          margin: const EdgeInsets.only(top: 20),
           padding: const EdgeInsets.all(10),
           width: double.infinity,
           child: Column(
@@ -63,7 +62,7 @@ class _HomePageState extends State<HomePage> {
                 height: 5,
               ),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(30),
                     border: Border.all(width: 2, color: Colors.grey.shade600)),
@@ -91,14 +90,15 @@ class _HomePageState extends State<HomePage> {
                               Container(
                                 height: 100,
                                 width: 100,
-                                padding: EdgeInsets.only(right: 10, top: 20),
+                                padding:
+                                    const EdgeInsets.only(right: 10, top: 20),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     GestureDetector(
-                                        child:
-                                            const Icon(CupertinoIcons.xmark_circle_fill))
+                                        child: const Icon(
+                                            CupertinoIcons.xmark_circle_fill))
                                   ],
                                 ),
                               )
@@ -130,18 +130,16 @@ class _HomePageState extends State<HomePage> {
                         Row(
                           children: [
                             IconButton(
-                              icon: const Icon(
-                                Icons.attach_file,
-                                color: Colors.white,
-                              ),
+                              icon: const Icon(Icons.attach_file,
+                                  color: Colors.white),
                               onPressed: () {
                                 controller.onSelectImage();
                               },
                             ),
                             IconButton(
+                              color: controller.microphoneColor,
                               icon: const Icon(
                                 Icons.mic,
-                                color: Colors.white,
                               ),
                               onPressed: () {
                                 controller.onStartListening();
@@ -154,7 +152,6 @@ class _HomePageState extends State<HomePage> {
                                 color: Colors.white,
                               ),
                               onPressed: () {
-
                                 var text = controller.textController.text
                                     .toString()
                                     .trim();

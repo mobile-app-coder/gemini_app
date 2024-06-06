@@ -19,13 +19,5 @@ class Utils {
     return base64Image;
   }
 
-// static Future<File> base64ToImage(String base64Image){
-//   try {
-//     List<int> imageBytes = base64Decode(base64Image);
-//     // Do something with the decoded bytes
-//   } catch (error) {
-//     // Handle the error
-//   }
-//
-// }
+
 }
