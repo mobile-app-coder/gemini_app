@@ -1,39 +1,39 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:gemini_app/presentation/controllers/home_controller.dart';
 
 import '../../data/models/message_model.dart';
 
-Widget itemOfGeminiMessage(MessageModel message) {
+Widget itemOfGeminiMessage(MessageModel message, HomeController controller) {
   return Container(
-    margin: EdgeInsets.only(top: 20),
-    padding: EdgeInsets.all(16),
+    margin: const EdgeInsets.only(top: 20),
+    padding: const EdgeInsets.all(16),
     width: double.infinity,
-    child: Container(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(
-                  CupertinoIcons.gear,
-                  color: Colors.grey,
-                ),
-                Icon(
-                  CupertinoIcons.volume_down,
-                  color: Colors.grey,
-                )
-              ]),
-          Container(
-              padding: EdgeInsets.only(top: 16),
-              child: Text(
-                message.message!,
-                style: TextStyle(color: Colors.grey),
-              )),
-        ],
-      ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          const Icon(
+            CupertinoIcons.gear,
+            color: Colors.grey,
+          ),
+          GestureDetector(
+            onTap: () {
+              controller.speak(message.message);
+            },
+            child: const Icon(
+              CupertinoIcons.volume_up,
+              color: Colors.grey,
+            ),
+          )
+        ]),
+        Container(
+            padding: const EdgeInsets.only(top: 16),
+            child: Text(
+              message.message!,
+              style: const TextStyle(color: Colors.grey),
+            )),
+      ],
     ),
   );
 }

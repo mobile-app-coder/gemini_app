@@ -19,7 +19,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     controller.getMessages();
     controller.initSpeech();
@@ -54,7 +53,7 @@ class _HomePageState extends State<HomePage> {
                     var message = controller.messages[index];
                     return message.isMine!
                         ? itemOfUserMessage(message)
-                        : itemOfGeminiMessage(message);
+                        : itemOfGeminiMessage(message, controller);
                   },
                 ),
               ),
