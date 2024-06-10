@@ -9,6 +9,7 @@ import 'package:gemini_app/domain/usecases/gemini_text_and_image_usecase.dart';
 import 'package:gemini_app/domain/usecases/get_messages_db_use_case.dart';
 import 'package:gemini_app/domain/usecases/save_message_db_uscase.dart';
 import 'package:get/get.dart';
+import 'package:shake/shake.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
@@ -29,28 +30,47 @@ class HomeController extends GetxController {
 
   String? image;
 
+  bool isLoading = false;
+
   apiTextOnly(String text) async {
     var either = await textOnlyUseCase.call(text);
     either.fold((l) {
       LogService.d(l);
       var messageModel = MessageModel(message: l, isMine: false);
-      messages.add(messageModel);
-      update();
+      updateMessages(messageModel, false);
       saveMessages(messageModel);
     }, (r) async {
       LogService.d(r);
       var messageModel = MessageModel(message: r, isMine: false);
-      messages.add(messageModel);
-      update();
+      updateMessages(messageModel, false);
       saveMessages(messageModel);
     });
+  }
+
+  apiTextAndImage(String text, String imageBase64) async {
+    var either = await textAndImageUseCase.call(text, imageBase64);
+    either.fold((l) {
+      LogService.d(l);
+      var messageModel = MessageModel(message: l, isMine: false);
+      updateMessages(messageModel, false);
+    }, (r) async {
+      LogService.d(r);
+      var messageModel = MessageModel(message: r, isMine: false);
+      updateMessages(messageModel, false);
+    });
+  }
+
+  updateMessages(MessageModel messageModel, bool isLoading) {
+    this.isLoading = isLoading;
+    messages.add(messageModel);
+    update();
+    saveMessages(messageModel);
   }
 
   onSendPressed(String text) {
     var myMessage =
         MessageModel(message: text, isMine: true, base64Image: image);
-    messages.add(myMessage);
-    update();
+    updateMessages(myMessage, true);
     saveMessages(myMessage);
 
     if (image == null) {
@@ -72,27 +92,6 @@ class HomeController extends GetxController {
     }
   }
 
-  updateMessages(MessageModel messageModel) {
-    messages.add(messageModel);
-    update();
-  }
-
-  apiTextAndImage(String text, String imageBase64) async {
-    var either =
-        await textAndImageUseCase.call(textController.text, imageBase64);
-    either.fold((l) {
-      LogService.d(l);
-      var messageModel = MessageModel(message: l, isMine: false);
-      messages.add(messageModel);
-      saveMessages(messageModel);
-    }, (r) async {
-      LogService.d(r);
-      var messageModel = MessageModel(message: r, isMine: false);
-      updateMessages(messageModel);
-      saveMessages(messageModel);
-    });
-  }
-
   onRemoveImage() {
     image = null;
     update();
@@ -104,7 +103,7 @@ class HomeController extends GetxController {
   ///
   SpeechToText speechToText = SpeechToText();
   bool speechEnabled = false;
-  Color microphoneColor = Colors.white;
+  Color microphoneColor = Colors.grey.shade600;
   String _lastWords = '';
 
   void initSpeech() async {
@@ -119,7 +118,7 @@ class HomeController extends GetxController {
 
   void stopListening() async {
     await speechToText.stop();
-    microphoneColor = Colors.white;
+    microphoneColor = Colors.grey.shade600;
     update();
   }
 
@@ -127,7 +126,7 @@ class HomeController extends GetxController {
     _lastWords = result.recognizedWords;
 
     if (result.finalResult) {
-      microphoneColor = Colors.white;
+      microphoneColor = Colors.grey.shade600;
 
       onSendPressed(_lastWords);
       update();
@@ -160,7 +159,7 @@ class HomeController extends GetxController {
   }
 
   //tts
-  FlutterTts flutterTts = FlutterTts();
+  FlutterTts? flutterTts;
 
   String? language;
   String? engine;
@@ -169,24 +168,40 @@ class HomeController extends GetxController {
   double rate = 0.5;
   bool isCurrentLanguageInstalled = false;
 
-  Color speekerColor = Colors.white;
+  Color speakerColor = Colors.grey.shade600;
 
   bool get isAndroid => !kIsWeb && Platform.isAndroid;
 
   bool get isIOS => !kIsWeb && Platform.isIOS;
+  bool isSpeaking = false;
 
-
+  dynamic initTts() {
+    flutterTts = FlutterTts();
+    flutterTts?.setCompletionHandler(() {
+      speakerColor = Colors.grey.shade600;
+      update();
+      isSpeaking = false;
+    });
+  }
 
   speak(String? text) async {
-    speekerColor = Colors.white;
-    update();
-    await flutterTts.setVolume(volume);
-    await flutterTts.setSpeechRate(rate);
-    await flutterTts.setPitch(pitch);
+    await flutterTts!.setVolume(volume);
+    await flutterTts!.setSpeechRate(rate);
+    await flutterTts!.setPitch(pitch);
 
     if (text != null) {
       if (text.isNotEmpty) {
-        await flutterTts.speak(text);
+        if (!isSpeaking) {
+          speakerColor = Colors.red;
+          update();
+          isSpeaking = true;
+          await flutterTts!.speak(text);
+        } else {
+          speakerColor = Colors.grey.shade600;
+          update();
+          isSpeaking = false;
+          flutterTts!.pause();
+        }
       }
     }
   }
@@ -194,6 +209,23 @@ class HomeController extends GetxController {
   @override
   void dispose() {
     super.dispose();
-    flutterTts.stop();
+    flutterTts!.stop();
+  }
+
+  //shake
+
+
+  initShake(context) async {
+    ShakeDetector? detector = ShakeDetector.autoStart(
+
+
+      onPhoneShake: () {
+       speak("What do you want to know about");
+      },
+      minimumShakeCount: 1,
+      shakeSlopTimeMS: 500,
+      shakeCountResetTime: 3000,
+      shakeThresholdGravity: 2.7,
+    );
   }
 }

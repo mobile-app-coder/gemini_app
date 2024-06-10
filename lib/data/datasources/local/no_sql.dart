@@ -3,14 +3,15 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
 class HiveService {
-  static var box = Hive.box("cards_db");
+  static const DB_NAME = "gemini_db";
+  static var box = Hive.box(DB_NAME);
 
   static init() async {
     var appDocumentary = await getApplicationDocumentsDirectory();
     Hive
       ..init(appDocumentary.path)
       ..registerAdapter(MessageModelAdapter());
-    await Hive.openBox("cards_db");
+    await Hive.openBox(DB_NAME);
   }
 
   static saveMessage(MessageModel message) async {

@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gemini_app/presentation/controllers/home_controller.dart';
-import 'package:gemini_app/presentation/widgets/item_f_gemini_message.dart';
-import 'package:gemini_app/presentation/widgets/item_of_user_message.dart';
+import 'package:gemini_app/presentation/widgets/item_gemini_message.dart';
+import 'package:gemini_app/presentation/widgets/item_user_message.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,6 +23,8 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     controller.getMessages();
     controller.initSpeech();
+    controller.initTts();
+    controller.initShake(context);
   }
 
   @override
@@ -33,35 +36,46 @@ class _HomePageState extends State<HomePage> {
           centerTitle: true,
           backgroundColor: Colors.black,
           title: Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            child: Image.asset(
-              height: 50,
-              "assets/images/gemini_logo.png",
-            ),
+            width: 130,
+            child: Lottie.asset("assets/animations/gemini_logo.json"),
           ),
         ),
         body: Container(
-          margin: const EdgeInsets.only(top: 20),
+          //margin: const EdgeInsets.only(top: 10),
           padding: const EdgeInsets.all(10),
           width: double.infinity,
           child: Column(
             children: [
               Expanded(
-                child: ListView.builder(
-                  itemCount: controller.messages.length,
-                  itemBuilder: (context, index) {
-                    var message = controller.messages[index];
-                    return message.isMine!
-                        ? itemOfUserMessage(message)
-                        : itemOfGeminiMessage(message, controller);
-                  },
+                child: Stack(
+                  children: [
+                    ListView.builder(
+                      itemCount: controller.messages.length,
+                      itemBuilder: (context, index) {
+                        var message = controller.messages[index];
+                        return message.isMine!
+                            ? itemOfUserMessage(message)
+                            : itemOfGeminiMessage(message, controller, context);
+                      },
+                    ),
+                    controller.isLoading
+                        ? Center(
+                            child: SizedBox(
+                              height: 70,
+                              child: Lottie.asset(
+                                  'assets/animations/gemini_buffering.json'),
+                            ),
+                          )
+                        : const SizedBox.shrink()
+                  ],
                 ),
               ),
               const SizedBox(
                 height: 5,
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                margin: const EdgeInsets.symmetric(horizontal: 15),
+                padding: const EdgeInsets.only(left: 20),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(30),
                     border: Border.all(width: 2, color: Colors.grey.shade600)),
@@ -120,17 +134,18 @@ class _HomePageState extends State<HomePage> {
                             cursorColor: Colors.white,
                             style: const TextStyle(color: Colors.white),
                             keyboardType: TextInputType.text,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: "Message",
-                                hintStyle: TextStyle(color: Colors.white)),
+                                hintStyle:
+                                    TextStyle(color: Colors.grey.shade600)),
                           ),
                         ),
                         Row(
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.attach_file,
-                                  color: Colors.white),
+                              icon: Icon(Icons.attach_file,
+                                  color: Colors.grey.shade600),
                               onPressed: () {
                                 controller.onSelectImage();
                               },
@@ -145,10 +160,11 @@ class _HomePageState extends State<HomePage> {
                               },
                             ),
                             IconButton(
-                              padding: EdgeInsets.symmetric(horizontal: -10),
-                              icon: const Icon(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: -10),
+                              icon: Icon(
                                 Icons.send,
-                                color: Colors.white,
+                                color: Colors.grey.shade600,
                               ),
                               onPressed: () {
                                 var text = controller.textController.text
