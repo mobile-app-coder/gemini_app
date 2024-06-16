@@ -60,6 +60,12 @@ dependencies:
   #progress barcode_widget:
   linear_progress_bar: ^1.1.1
 
+  #firebase and google sign in
+  firebase_core: ^3.1.0
+  firebase_auth:
+  google_sign_in: ^6.2.1
+  firebase_analytics: ^11.0.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

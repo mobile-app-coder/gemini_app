@@ -13,10 +13,12 @@ import 'package:shake/shake.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
+import '../../core/services/auth_service.dart';
 import '../../core/services/log_service.dart';
 import '../../data/models/message_model.dart';
 import '../../data/repository/gemini_talk_repository_impl.dart';
 import '../../domain/usecases/gemini_only_text_usecase.dart';
+import '../pages/starter_page.dart';
 
 class HomeController extends GetxController {
   List<MessageModel> messages = [];
@@ -214,18 +216,24 @@ class HomeController extends GetxController {
 
   //shake
 
-
   initShake(context) async {
     ShakeDetector? detector = ShakeDetector.autoStart(
-
-
       onPhoneShake: () {
-       speak("What do you want to know about");
+        speak("What do you want to know about");
       },
       minimumShakeCount: 1,
       shakeSlopTimeMS: 500,
       shakeCountResetTime: 3000,
       shakeThresholdGravity: 2.7,
     );
+  }
+
+  callSignOut(BuildContext context) async {
+    await AuthService.signOutFromGoogle();
+    Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (BuildContext context) {
+      return const StarterPage();
+    }));
+    var result = await AuthService.signOutFromGoogle();
   }
 }

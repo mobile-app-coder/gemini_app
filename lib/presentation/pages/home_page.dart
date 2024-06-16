@@ -8,6 +8,8 @@ import 'package:gemini_app/presentation/widgets/item_user_message.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../core/services/utils_service.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -39,6 +41,30 @@ class _HomePageState extends State<HomePage> {
             width: 130,
             child: Lottie.asset("assets/animations/gemini_logo.json"),
           ),
+          actions: [
+            GestureDetector(
+              onTap: () {
+                Utils.dialogCommon(
+                  context,
+                  "Log out",
+                  "Do you want to log out",
+                  false,
+                  () => {controller.callSignOut(context)},
+                );
+              },
+              child: const ClipRRect(
+                borderRadius: BorderRadius.all(Radius.circular(15)),
+                child: Image(
+                  image: AssetImage("assets/images/profile.png"),
+                  width: 30,
+                  height: 30,
+                ),
+              ),
+            ),
+            const SizedBox(
+              width: 10,
+            )
+          ],
         ),
         body: Container(
           //margin: const EdgeInsets.only(top: 10),

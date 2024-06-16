@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../core/services/auth_service.dart';
+
 class StarterPage extends StatefulWidget {
   const StarterPage({super.key});
 
@@ -55,26 +57,52 @@ class _StarterPageState extends State<StarterPage> {
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(30),
                       border: Border.all(color: Colors.white, width: 2)),
-                  child: MaterialButton(
-                      onPressed: () {
-                        Get.off(() => const HomePage());
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Chat with gemini'.toUpperCase(),
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          const Icon(
-                            Icons.arrow_forward,
-                            color: Colors.white,
-                          )
-                        ],
-                      )),
+                  child: AuthService.isLoggedIn()
+                      ? MaterialButton(
+                          onPressed: () {
+                            starterController.callHomePage(context);
+                            //bloc.callGoogleSignIn(context);
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Chat with gemini'.toUpperCase(),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              const Icon(
+                                Icons.arrow_forward,
+                                color: Colors.white,
+                              )
+                            ],
+                          ))
+                      : MaterialButton(
+                          onPressed: () {
+                            //bloc.callHomePage(context);
+
+                            starterController.callGoogleSignIn(context);
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Image(
+                                height: 25,
+                                width: 25,
+                                image:
+                                    AssetImage("assets/images/google_logo.png"),
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              Text(
+                                'Sign in with google'.toUpperCase(),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          )),
                 ),
               ],
             )

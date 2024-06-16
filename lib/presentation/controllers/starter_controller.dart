@@ -7,11 +7,13 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../core/services/auth_service.dart';
+import '../pages/home_page.dart';
+
 class StarterController extends GetxController {
   late VideoPlayerController controller;
 
-  initVideoPlayer() async
-  {
+  initVideoPlayer() async {
     controller = VideoPlayerController.asset("assets/videos/gemini.mp4")
       ..initialize().then((_) {
         update();
@@ -19,15 +21,11 @@ class StarterController extends GetxController {
     controller.play();
 
     controller.setLooping(true);
-
   }
 
   onDispose() {
     controller.dispose();
   }
-
-
-
 
   //tts
   FlutterTts flutterTts = FlutterTts();
@@ -38,8 +36,6 @@ class StarterController extends GetxController {
   double pitch = 1.0;
   double rate = 0.7;
   bool isCurrentLanguageInstalled = false;
-
-
 
   bool get isAndroid => !kIsWeb && Platform.isAndroid;
 
@@ -61,5 +57,19 @@ class StarterController extends GetxController {
   void dispose() {
     super.dispose();
     flutterTts.stop();
+  }
+
+  callHomePage(BuildContext context) {
+    flutterTts.stop();
+    controller.dispose();
+    Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (BuildContext context) {
+      return HomePage();
+    }));
+  }
+
+  callGoogleSignIn(BuildContext context) async {
+    await AuthService.signInWithGoogle();
+    callHomePage(context);
   }
 }
